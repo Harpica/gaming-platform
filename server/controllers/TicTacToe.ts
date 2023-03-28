@@ -41,14 +41,17 @@ export class TicTacToe extends Game {
             return this.handleTurn(turn, position);
         }
     }
-    private handleTurn(turn: Turn, { row, col }: Position): boolean {
+    private handleTurn(turn: Turn, { row, col }: Position) {
         this.matrix.setElement(row, col, turn);
         const winPossible =
             this.matrix.elements.length >= this.winSequence * 2 - 1;
         if (winPossible) {
-            return this.checkIsWinner(turn, { row, col });
+            return {
+                turn: turn,
+                isWinner: this.checkIsWinner(turn, { row, col }),
+            };
         }
-        return false;
+        return { turn: turn, isWinner: false };
     }
 
     private checkIsWinner(turn: Turn, { row, col }: Position) {

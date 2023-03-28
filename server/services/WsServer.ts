@@ -5,7 +5,12 @@ import { TicTacToe, TicTacToeData } from '../controllers/TicTacToe';
 import { Clients } from '../utils/Clients';
 import { uid } from '../utils/utils';
 
-type Message = InitMessage | SessionMessage | ChatMessage | GameMessage;
+type Message =
+    | InitMessage
+    | SessionMessage
+    | ChatMessage
+    | ReadinessMessage
+    | GameMessage;
 
 interface InitMessage {
     type: 'init';
@@ -26,6 +31,13 @@ interface ChatMessage {
     body: string;
 }
 
+interface ReadinessMessage {
+    type: 'ready';
+    sessionID: string;
+    name: string;
+    isReady: boolean;
+}
+
 interface GameMessage {
     type: 'game';
     stage: string;
@@ -40,21 +52,26 @@ type GameObject = TicTacToe;
 
 type GameData = TicTacToeData;
 
+export interface Session {
+    host: string;
+    guest: string;
+    game: GameObject;
+    config: GameData;
+    isReady: { [key: string]: boolean };
+}
+
 export class WsServer {
     private wss: WebSocketServer;
     private clients: Clients;
-    private sessions: Map<
-        string,
-        { host: string; guest: string; game: GameObject }
-    >;
+    private sessions: Map<string, Session>;
 
-    constructor(server: Server<typeof IncomingMessage, typeof ServerResponse>) {
+    constructor(
+        server: Server<typeof IncomingMessage, typeof ServerResponse>,
+        sessions: Map<string, Session>
+    ) {
         this.wss = new WebSocketServer({ server });
         this.clients = new Clients();
-        this.sessions = new Map<
-            string,
-            { host: string; guest: string; game: GameObject }
-        >();
+        this.sessions = sessions;
     }
 
     start() {
@@ -85,6 +102,9 @@ export class WsServer {
             case 'chat':
                 this.sendChatMessage(data, client);
                 break;
+            case 'ready':
+                this.handleReadinessMessage(data, client);
+                break;
             case 'game':
                 this.handleGameMessage(data, client);
                 break;
@@ -102,26 +122,34 @@ export class WsServer {
         if (this.checkSender(sender)) {
             if (data.isHost) {
                 const host = this.clients.getName(sender) as string;
-                const game = this.setNewGame(data.game, data.data);
+                const game = this.setNewGame(data.game, data.data as GameData);
                 const id = uid();
                 if (!game) {
                     sender.send(
                         JSON.stringify({ error: 'Game parameters are wrong' })
                     );
-                } else
+                } else {
                     this.sessions.set(id, {
                         host: host,
                         game: game,
                         guest: 'none',
+                        config: data.data as GameData,
+                        isReady: { [host]: false },
                     });
-                sender.send('User connected to your session');
+                    sender.send('New session starts');
+                }
             } else if (data.sessionID) {
                 const session = this.sessions.get(data.sessionID)!;
                 session.guest = this.clients.getName(sender) as string;
                 this.sessions.set(data.sessionID, session);
                 sender.send(
                     JSON.stringify({
-                        data: { sessionID: session },
+                        data: session,
+                    })
+                );
+                this.clients.getWs(session.host)?.send(
+                    JSON.stringify({
+                        data: session,
                     })
                 );
             }
@@ -136,8 +164,45 @@ export class WsServer {
         }
     }
 
+    private handleReadinessMessage(data: ReadinessMessage, sender: WebSocket) {
+        const session = this.sessions.get(data.sessionID);
+        if (session) {
+            session.isReady[data.name] = data.isReady;
+            const opponent = this.findOpponent(data, sender)?.ws;
+            sender.send(
+                JSON.stringify({
+                    data: {
+                        name: data.name,
+                        isReady: data.isReady,
+                    },
+                })
+            );
+            if (opponent)
+                opponent.send(
+                    JSON.stringify({
+                        data: {
+                            name: data.name,
+                            isReady: data.isReady,
+                        },
+                    })
+                );
+        }
+    }
+
     private handleGameMessage(data: GameMessage, sender: WebSocket) {
-        const opponent = this.findOpponent(data, sender);
+        const opponent = this.findOpponent(data, sender)?.ws;
+        if (data.stage === 'new game') {
+            const session = this.sessions.get(data.sessionID);
+            const game = this.setNewGame(
+                data.game,
+                session?.config as GameData
+            );
+            if (session && game && opponent) {
+                session.game = game;
+                sender.send('new game is initialized');
+                opponent.send('new game is initialized');
+            }
+        }
         if (this.checkSender(sender) && opponent !== undefined) {
             const response = this.sessions
                 .get(data.sessionID)
@@ -152,10 +217,10 @@ export class WsServer {
         }
     }
 
-    private setNewGame(game: Game, config: unknown) {
+    private setNewGame(game: Game, config: GameData) {
         switch (game) {
             case 'TicTacToe':
-                return new TicTacToe(config as number);
+                return new TicTacToe(config.gridSize as number);
 
             default:
                 break;
@@ -166,12 +231,15 @@ export class WsServer {
         return this.clients.getName(sender) !== undefined;
     }
 
-    private findOpponent(data: GameMessage, sender: WebSocket) {
+    private findOpponent(
+        data: GameMessage | ReadinessMessage,
+        sender: WebSocket
+    ) {
         const session = this.sessions.get(data.sessionID);
         if (session) {
             return this.clients.getWs(session.guest) === sender
-                ? this.clients.getWs(session.guest)
-                : this.clients.getWs(session.host);
+                ? { type: 'host', ws: this.clients.getWs(session.host) }
+                : { type: 'guest', ws: this.clients.getWs(session.guest) };
         }
     }
 }
