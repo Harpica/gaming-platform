@@ -13,3 +13,17 @@
 /* Stop purging. */
 
 /* Your own custom utilities */
+
+.svg-fill {
+    @apply fill-black;
+}
+.svg-stroke {
+    @apply stroke-gray-500;
+}
+
+.svg-container:hover .svg-fill {
+    @apply fill-indigo-600;
+}
+.svg-container:hover .svg-stroke {
+    @apply stroke-indigo-600;
+}
