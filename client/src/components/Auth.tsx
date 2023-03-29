@@ -1,8 +1,7 @@
-interface AuthFormProps {
-    vm: any;
-}
+import { MainViewChildProps } from '../utils/types';
+import { observer } from 'mobx-react-lite';
 
-const AuthForm: React.FC<AuthFormProps> = ({ vm }) => {
+const AuthForm: React.FC<MainViewChildProps> = observer(({ vm }) => {
     return (
         <div className='w-full flex justify-center '>
             <form
@@ -39,6 +38,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ vm }) => {
             </form>
         </div>
     );
-};
+});
 
 export default AuthForm;

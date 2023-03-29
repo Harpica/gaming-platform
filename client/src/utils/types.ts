@@ -1,10 +1,17 @@
+import { MainVM } from '../viewModels/Main.VM';
+
 export interface SessionData {
     id: string;
     isHost: boolean;
     game: Game;
 }
 
-export type Message = InitMessage | SessionMessage | ChatMessage | GameMessage;
+export type Message =
+    | InitMessage
+    | SessionMessage
+    | ChatMessage
+    | ReadinessMessage
+    | GameMessage;
 
 export interface InitMessage {
     type: 'init';
@@ -25,6 +32,13 @@ export interface ChatMessage {
     body: string;
 }
 
+export interface ReadinessMessage {
+    type: 'ready';
+    sessionID: string;
+    name: string;
+    isReady: boolean;
+}
+
 export interface GameMessage {
     type: 'game';
     stage: string;
@@ -33,7 +47,17 @@ export interface GameMessage {
     data: GameData;
 }
 
-export type Game = 'TicTacToe' | 'none';
+export interface Session {
+    sessionID: string;
+    host: string;
+    guest: string;
+    game: Game;
+    config: GameData;
+    isReady: { [key: string]: boolean };
+    isHost?: boolean;
+}
+
+export type Game = 'Tic-Tac-Toe' | 'none';
 
 export type GameData = TicTacToeData;
 
@@ -47,4 +71,8 @@ export interface TicTacToeData {
     gridSize?: number;
     position?: Position;
     turn?: Turn;
+}
+
+export interface MainViewChildProps {
+    vm: MainVM;
 }
