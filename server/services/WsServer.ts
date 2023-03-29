@@ -46,7 +46,7 @@ interface GameMessage {
     data: GameData;
 }
 
-type Game = 'TicTacToe';
+type Game = 'Tic-Tac-Toe';
 
 type GameObject = TicTacToe;
 
@@ -55,7 +55,8 @@ type GameData = TicTacToeData;
 export interface Session {
     host: string;
     guest: string;
-    game: GameObject;
+    game: Game;
+    gameObject: GameObject;
     config: GameData;
     isReady: { [key: string]: boolean };
 }
@@ -115,7 +116,7 @@ export class WsServer {
 
     private initClient(data: InitMessage, sender: WebSocket) {
         this.clients.setClient(data.name, sender);
-        sender.send('Connected');
+        sender.send(JSON.stringify({ message: 'Connected' }));
     }
 
     private handleSessionMessage(data: SessionMessage, sender: WebSocket) {
@@ -131,25 +132,43 @@ export class WsServer {
                 } else {
                     this.sessions.set(id, {
                         host: host,
-                        game: game,
+                        game: data.game,
+                        gameObject: game,
                         guest: 'none',
                         config: data.data as GameData,
                         isReady: { [host]: false },
                     });
-                    sender.send('New session starts');
+                    const response = {
+                        ...this.sessions.get(id),
+                        game: data.game,
+                        sessionID: id,
+                    };
+                    sender.send(
+                        JSON.stringify({
+                            type: 'session',
+                            data: response,
+                        })
+                    );
                 }
             } else if (data.sessionID) {
                 const session = this.sessions.get(data.sessionID)!;
                 session.guest = this.clients.getName(sender) as string;
                 this.sessions.set(data.sessionID, session);
+                const response = {
+                    ...session,
+                    game: data.game,
+                    sessionID: data.sessionID,
+                };
                 sender.send(
                     JSON.stringify({
-                        data: session,
+                        type: 'session',
+                        data: response,
                     })
                 );
                 this.clients.getWs(session.host)?.send(
                     JSON.stringify({
-                        data: session,
+                        type: 'session',
+                        data: response,
                     })
                 );
             }
@@ -158,9 +177,19 @@ export class WsServer {
 
     private sendChatMessage(data: ChatMessage, sender: WebSocket) {
         if (this.checkSender(sender)) {
-            sender.send(JSON.stringify(data));
+            sender.send(
+                JSON.stringify({
+                    type: 'chat',
+                    data: data,
+                })
+            );
             const repicient = this.clients.getWs(data.repicientName);
-            repicient?.send(JSON.stringify(data));
+            repicient?.send(
+                JSON.stringify({
+                    type: 'chat',
+                    data: data,
+                })
+            );
         }
     }
 
@@ -171,6 +200,7 @@ export class WsServer {
             const opponent = this.findOpponent(data, sender)?.ws;
             sender.send(
                 JSON.stringify({
+                    type: 'ready',
                     data: {
                         name: data.name,
                         isReady: data.isReady,
@@ -180,6 +210,7 @@ export class WsServer {
             if (opponent)
                 opponent.send(
                     JSON.stringify({
+                        type: 'ready',
                         data: {
                             name: data.name,
                             isReady: data.isReady,
@@ -198,28 +229,36 @@ export class WsServer {
                 session?.config as GameData
             );
             if (session && game && opponent) {
-                session.game = game;
-                sender.send('new game is initialized');
-                opponent.send('new game is initialized');
+                session.gameObject = game;
+                sender.send(
+                    JSON.stringify({ message: 'new game is initialized' })
+                );
+                opponent.send(
+                    JSON.stringify({ message: 'new game is initialized' })
+                );
             }
         }
         if (this.checkSender(sender) && opponent !== undefined) {
             const response = this.sessions
                 .get(data.sessionID)
-                ?.game.playGame(data.data, data.stage);
+                ?.gameObject.playGame(data.data, data.stage);
             if (isSensitiveData(response)) {
-                sender.send(JSON.stringify({ data: response.sender }));
-                opponent.send(JSON.stringify({ data: response.rest }));
+                sender.send(
+                    JSON.stringify({ type: 'game', data: response.sender })
+                );
+                opponent.send(
+                    JSON.stringify({ type: 'game', data: response.rest })
+                );
             } else {
-                sender.send(JSON.stringify({ data: response }));
-                opponent.send(JSON.stringify({ data: response }));
+                sender.send(JSON.stringify({ type: 'game', data: response }));
+                opponent.send(JSON.stringify({ type: 'game', data: response }));
             }
         }
     }
 
     private setNewGame(game: Game, config: GameData) {
         switch (game) {
-            case 'TicTacToe':
+            case 'Tic-Tac-Toe':
                 return new TicTacToe(config.gridSize as number);
 
             default:

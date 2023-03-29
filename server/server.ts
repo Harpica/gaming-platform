@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
 import { Session, WsServer } from './services/WsServer';
+import { getSessions, sessions } from './controllers/Sessions';
 
 // Usage of .env file in the root dir
 dotenv.config();
@@ -14,14 +15,10 @@ const corsOptions = {
     origin: '*',
 };
 
-const sessions = new Map<string, Session>();
-
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/sessions', (req, res) => {
-    res.status(200).send(Array.from(sessions));
-});
+app.use('/sessions', getSessions);
 
 const server = app.listen(PORT, () => {
     console.log('Listening to', PORT);

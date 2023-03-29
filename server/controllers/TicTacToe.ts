@@ -16,7 +16,7 @@ export interface TicTacToeData {
 export class TicTacToe extends Game {
     matrix: Matrix;
     winSequence: number;
-    constructor(gridSize: number) {
+    constructor(gridSize: number = 3) {
         super();
         this.matrix = new Matrix(gridSize);
         this.winSequence = this.setWinSequence(gridSize);
@@ -119,7 +119,7 @@ export class TicTacToe extends Game {
         return counter === this.winSequence ? true : false;
     }
 
-    private setWinSequence(gridSize: number) {
+    private setWinSequence(gridSize: number | undefined) {
         switch (gridSize) {
             case 3:
                 return 3;
@@ -128,7 +128,7 @@ export class TicTacToe extends Game {
             case 7:
                 return 4;
             default:
-                return 5;
+                return 3;
         }
     }
 }
