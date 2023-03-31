@@ -8,10 +8,11 @@ import AuthForm from './Auth';
 import SessionOptions from './SessionOptions';
 import GamesChoice from './GamesChoice';
 import { observer } from 'mobx-react-lite';
-import { MainViewChildProps } from '../utils/types';
+import { ViewChildProps } from '../utils/types';
 import Sessions from './Sessions';
+import { MainVM } from '../viewModels/Main.VM';
 
-const LoginStepper: React.FC<MainViewChildProps> = observer(({ vm }) => {
+const LoginStepper: React.FC<ViewChildProps<MainVM>> = observer(({ vm }) => {
     console.log(vm.session.isHost);
     return (
         <>

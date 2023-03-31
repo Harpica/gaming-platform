@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
+import { Routes, Route } from 'react-router';
 import ProtectedRoute from './components/ProtectedRoute';
 import { DEFAULT_SESSION } from './utils/constants';
 import { Session } from './utils/types';
@@ -7,7 +8,7 @@ import GameView from './views/GameView';
 import MainView from './views/MainView';
 
 function App() {
-    const [isAuth, setIsAuth] = useState<boolean>(true);
+    const [isAuth, setIsAuth] = useState<boolean>(false);
     const [currentUser, setCurrentUser] = useState<string>('default');
     const [session, setSession] = useState<Session>(DEFAULT_SESSION);
     return (
@@ -29,7 +30,13 @@ function App() {
                     path='/game'
                     element={
                         <ProtectedRoute authKey={isAuth}>
-                            <GameView />
+                            <GameView
+                                currentUser={currentUser}
+                                setCurrentUser={setCurrentUser}
+                                setIsAuth={setIsAuth}
+                                session={session}
+                                setSession={setSession}
+                            />
                         </ProtectedRoute>
                     }
                 />

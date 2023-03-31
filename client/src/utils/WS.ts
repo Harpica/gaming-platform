@@ -1,9 +1,10 @@
 import { BASE_URL } from '../utils/constants';
-import { Message } from './types';
+import { Message, MessageHandler } from './types';
 import { makeAutoObservable } from 'mobx';
 
 export class WS {
     ws: WebSocket | null = null;
+    messageHandler: MessageHandler = {};
     constructor() {
         makeAutoObservable(this);
     }
@@ -24,15 +25,20 @@ export class WS {
             this.ws!.send(data);
         };
     }
-    listenToMessages(messageHandler: Function) {
+    listenToMessages() {
         this.ws!.onmessage = (e) => {
             const data = JSON.parse(e.data);
             if (data.error) {
                 console.log(data.error);
             } else {
-                messageHandler(data);
+                console.log();
+                console.log(this.messageHandler[data.type]);
+                this.messageHandler[data.type](data);
             }
         };
+    }
+    addFunctionToMessageHandler(type: string, func: (data: any) => void) {
+        this.messageHandler[type] = func;
     }
     sendMessage(message: Message) {
         const data = JSON.stringify(message);

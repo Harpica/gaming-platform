@@ -1,45 +1,58 @@
 import ReadyCheck from '../components/ReadyCheck';
 import TicTacToe from '../components/TicTacToe';
+import { useNavigate } from 'react-router';
+import Chat from './ChatView';
+import { observer } from 'mobx-react-lite';
+import { Session } from '../utils/types';
+import { ws } from '../utils/WS';
+import { GameVM } from '../viewModels/Game.VM';
+import { useMemo } from 'react';
 
-const GameView = () => {
-    return (
-        <div className='grid justify-center grid-cols-[400px_1fr] w-full  h-screen text-white bg-gradient-to-r from-sky-500 to-indigo-500 overflow-hidden'>
-            {/* Chat */}
-            <div className='grid grid-rows-[1fr_60px] bg-white p-4'>
-                <ul className='list-none flex flex-col justify-end gap-3 pb-4 overflow-auto'>
-                    <li className='bg-indigo-400 rounded shadow-md p-3 ml-3'>
-                        Some message
-                    </li>
-                    <li className='bg-blue-400 rounded shadow-md p-3 mr-3'>
-                        Some message Very very very very big message it is
-                    </li>
-                </ul>
-                <form className='self-center flex flex-row justify-between'>
-                    <input
-                        type={'text'}
-                        name='chat'
-                        placeholder='Start writting...'
-                        className='text-black p-3 outline-none focus:outline-none'
-                    />
-                    <button type='submit' className='text-indigo-600'>
-                        Send
+interface GameViewProps {
+    currentUser: string;
+    setCurrentUser: React.Dispatch<React.SetStateAction<string>>;
+    session: Session;
+    setSession: React.Dispatch<React.SetStateAction<Session>>;
+    setIsAuth: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const GameView: React.FC<GameViewProps> = observer(
+    ({ currentUser, setCurrentUser, session, setSession, setIsAuth }) => {
+        const navigate = useNavigate();
+        const vm = useMemo(() => {
+            return new GameVM(
+                currentUser,
+                setCurrentUser,
+                session,
+                setSession,
+                setIsAuth,
+                ws,
+                navigate
+            );
+        }, []);
+
+        return (
+            <div className='grid justify-center grid-cols-[400px_1fr] w-full  h-screen text-white bg-gradient-to-r from-sky-500 to-indigo-500 overflow-hidden'>
+                <Chat currentUser={currentUser} opponent={vm.opponent} />
+                <div className='grid grid-rows-[50px_1fr] grid-cols-[1fr] justify-center w-full'>
+                    <button
+                        type='button'
+                        aria-label='exit'
+                        className='justify-self-end pr-4'
+                        onClick={() => {
+                            vm.logOut();
+                        }}
+                    >
+                        Exit
                     </button>
-                </form>
+                    {!vm.isStarted && <ReadyCheck vm={vm} />}
+                    {vm.isStarted && vm.session.game === 'Tic-Tac-Toe' && (
+                        <TicTacToe vm={vm} />
+                    )}
+                </div>
             </div>
-            {/* Game */}
-            <div className='grid grid-rows-[50px_1fr] grid-cols-[1fr] justify-center w-full'>
-                <button
-                    type='button'
-                    aria-label='exit'
-                    className='justify-self-end pr-4'
-                >
-                    Exit
-                </button>
-                <ReadyCheck />
-                <TicTacToe />
-            </div>
-        </div>
-    );
-};
+        );
+    }
+);
 
 export default GameView;

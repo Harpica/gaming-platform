@@ -1,6 +1,7 @@
-import { MainViewChildProps } from '../utils/types';
+import { ViewChildProps } from '../utils/types';
+import { MainVM } from '../viewModels/Main.VM';
 
-const SessionOptions: React.FC<MainViewChildProps> = ({ vm }) => {
+const SessionOptions: React.FC<ViewChildProps<MainVM>> = ({ vm }) => {
     return (
         <ul className='w-full flex list-none justify-around flex-wrap gap-5'>
             <li

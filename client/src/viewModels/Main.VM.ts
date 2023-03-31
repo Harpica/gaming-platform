@@ -1,6 +1,12 @@
 import { makeAutoObservable } from 'mobx';
 import { LOGIN_STEPS } from '../utils/constants';
-import { Game, GameData, Session, SessionMessage } from '../utils/types';
+import {
+    Game,
+    GameData,
+    Session,
+    SessionMessage,
+    SessionMessageResponse,
+} from '../utils/types';
 import { WS } from '../utils/WS';
 import { NavigateFunction } from 'react-router';
 import { Api } from '../utils/API';
@@ -28,7 +34,7 @@ export class MainVM {
         navigate: NavigateFunction
     ) {
         this.currentUser = currentUser;
-        this.setCurrentUser = setCurrentUser;
+        this.setCurrentUser = setCurrentUser.bind(this);
         this.activeStep = 0;
         this.steps = LOGIN_STEPS;
         this.session = session;
@@ -65,14 +71,17 @@ export class MainVM {
 
     loginUser(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        this.ws.setWSConnection(
-            (e.currentTarget.elements.namedItem('name') as HTMLInputElement)
-                .value
-        );
-        this.ws.listenToMessages(() => {
-            console.log('listening');
-            this.handleNext();
+        const name = (
+            e.currentTarget.elements.namedItem('name') as HTMLInputElement
+        ).value;
+        this.ws.setWSConnection(name);
+        this.ws.addFunctionToMessageHandler('init', () => {
+            console.log('connected');
         });
+        this.ws.listenToMessages();
+        this.currentUser = name;
+        this.setCurrentUser(name);
+        this.handleNext();
     }
 
     handleCreateOrJoinChoice(value: boolean) {
@@ -90,18 +99,22 @@ export class MainVM {
             game: game,
             data: options,
         };
+        this.ws.addFunctionToMessageHandler(
+            'session',
+            (data: SessionMessageResponse) => {
+                // this.setSession(data.data);
+                this.setSession({
+                    ...this.session,
+                    sessionID: data.data.sessionID as string,
+                    game: data.data.game,
+                    config: data.data.config ?? {},
+                    host: this.currentUser,
+                });
+                this.setIsAuth(true);
+                this.navigate('/game', { replace: true });
+            }
+        );
         this.ws.sendMessage(message);
-        this.ws.listenToMessages((data: SessionMessage) => {
-            console.log(data);
-            this.setSession({
-                ...this.session,
-                sessionID: data.sessionID as string,
-                game: data.game,
-                config: data.data ?? {},
-                host: this.currentUser,
-            });
-            this.navigate('/game', { replace: true });
-        });
     }
 
     handleSessionChoice(session: Session) {
@@ -112,17 +125,22 @@ export class MainVM {
             data: session.config,
             sessionID: session.sessionID,
         };
+        this.ws.addFunctionToMessageHandler(
+            'session',
+            (data: SessionMessageResponse) => {
+                this.setSession({
+                    ...this.session,
+                    isReady: data.data.isReady,
+                    sessionID: data.data.sessionID as string,
+                    game: data.data.game,
+                    config: data.data.config ?? {},
+                    host: session.host,
+                    guest: session.guest,
+                });
+                this.setIsAuth(true);
+                this.navigate('/game', { replace: true });
+            }
+        );
         this.ws.sendMessage(message);
-        this.ws.listenToMessages((data: SessionMessage) => {
-            console.log(data);
-            this.setSession({
-                ...this.session,
-                sessionID: data.sessionID as string,
-                game: data.game,
-                config: data.data ?? {},
-                host: session.host,
-            });
-            this.navigate('/game', { replace: true });
-        });
     }
 }

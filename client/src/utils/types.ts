@@ -1,17 +1,14 @@
+import { GameVM } from '../viewModels/Game.VM';
 import { MainVM } from '../viewModels/Main.VM';
-
-export interface SessionData {
-    id: string;
-    isHost: boolean;
-    game: Game;
-}
+import { TicTacToe } from './TicTacToe';
 
 export type Message =
     | InitMessage
     | SessionMessage
     | ChatMessage
     | ReadinessMessage
-    | GameMessage;
+    | GameMessage
+    | SessionMessageResponse;
 
 export interface InitMessage {
     type: 'init';
@@ -25,11 +22,23 @@ export interface SessionMessage {
     game: Game;
     data?: GameData;
 }
+export interface SessionMessageResponse {
+    type: 'session';
+    data: {
+        sessionID: string;
+        host: string;
+        guest: string;
+        game: Game;
+        config: GameData;
+        isReady: { [key: string]: boolean };
+        isHost?: boolean;
+    };
+}
 
 export interface ChatMessage {
     type: 'chat';
     repicientName: string;
-    body: string;
+    data: ChatMessageData;
 }
 
 export interface ReadinessMessage {
@@ -38,12 +47,23 @@ export interface ReadinessMessage {
     name: string;
     isReady: boolean;
 }
+export interface ReadinessMessageResponse {
+    type: 'ready';
+    data: {
+        name: string;
+        isReady: boolean;
+    };
+}
 
 export interface GameMessage {
     type: 'game';
     stage: string;
     game: Game;
     sessionID: string;
+    data: GameData;
+}
+export interface GameMessageResponse {
+    type: 'game';
     data: GameData;
 }
 
@@ -59,20 +79,32 @@ export interface Session {
 
 export type Game = 'Tic-Tac-Toe' | 'none';
 
+export type GameObject = TicTacToe;
+
 export type GameData = TicTacToeData;
 
-interface Position {
+export interface Position {
     row: number;
     col: number;
 }
-type Turn = 'x' | 'o';
+export type Turn = 'x' | 'o';
 
 export interface TicTacToeData {
+    stage?: string;
     gridSize?: number;
     position?: Position;
     turn?: Turn;
+    isWinner?: boolean;
+    winPositions?: Array<Position>;
 }
 
-export interface MainViewChildProps {
-    vm: MainVM;
+export interface ViewChildProps<T> {
+    vm: T;
 }
+
+export interface ChatMessageData {
+    sender: string;
+    body: string;
+}
+
+export type MessageHandler = { [key: string]: (data: any) => void };

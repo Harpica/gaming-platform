@@ -1,8 +1,9 @@
 import Slider from '@mui/material/Slider';
 import { observer } from 'mobx-react-lite';
-import { MainViewChildProps } from '../utils/types';
+import { ViewChildProps } from '../utils/types';
+import { MainVM } from '../viewModels/Main.VM';
 
-const GamesChoice: React.FC<MainViewChildProps> = observer(({ vm }) => {
+const GamesChoice: React.FC<ViewChildProps<MainVM>> = observer(({ vm }) => {
     return (
         <ul className='w-full flex list-none justify-around flex-wrap gap-5'>
             <li>
@@ -11,7 +12,7 @@ const GamesChoice: React.FC<MainViewChildProps> = observer(({ vm }) => {
                     onSubmit={(e) => {
                         e.preventDefault();
                         vm.handleGameChoice('Tic-Tac-Toe', {
-                            gridSize: vm.session.config.gridSize,
+                            gridSize: vm.session.config.gridSize || 3,
                         });
                     }}
                 >
@@ -28,10 +29,10 @@ const GamesChoice: React.FC<MainViewChildProps> = observer(({ vm }) => {
                             console.log(vm.session.config.gridSize);
                         }}
                         valueLabelDisplay='auto'
-                        step={1}
+                        step={2}
                         marks
                         min={3}
-                        max={5}
+                        max={7}
                     />
                     <div className='rounded bg-gradient-to-r from-sky-500 to-indigo-500 p-1 hover:opacity-80 transition-all active:scale-90 shrink-0 self-center '>
                         <button

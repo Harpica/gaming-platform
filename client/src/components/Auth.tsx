@@ -1,7 +1,8 @@
-import { MainViewChildProps } from '../utils/types';
+import { ViewChildProps } from '../utils/types';
 import { observer } from 'mobx-react-lite';
+import { MainVM } from '../viewModels/Main.VM';
 
-const AuthForm: React.FC<MainViewChildProps> = observer(({ vm }) => {
+const AuthForm: React.FC<ViewChildProps<MainVM>> = observer(({ vm }) => {
     return (
         <div className='w-full flex justify-center '>
             <form

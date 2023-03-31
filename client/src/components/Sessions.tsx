@@ -5,8 +5,9 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import { MainViewChildProps } from '../utils/types';
+import { ViewChildProps } from '../utils/types';
 import { observer } from 'mobx-react-lite';
+import { MainVM } from '../viewModels/Main.VM';
 
 function createData(name: string, game: string) {
     return { name, game };
@@ -18,7 +19,7 @@ const rows = [
     createData('Eclair', 'Tic-Tac-Toe'),
 ];
 
-const Sessions: React.FC<MainViewChildProps> = observer(({ vm }) => {
+const Sessions: React.FC<ViewChildProps<MainVM>> = observer(({ vm }) => {
     useEffect(() => {
         vm.getSessions();
     }, []);
