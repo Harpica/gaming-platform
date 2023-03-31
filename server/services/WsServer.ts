@@ -28,7 +28,10 @@ interface SessionMessage {
 interface ChatMessage {
     type: 'chat';
     repicientName: string;
-    body: string;
+    data: {
+        sender: string;
+        body: string;
+    };
 }
 
 interface ReadinessMessage {
@@ -116,7 +119,9 @@ export class WsServer {
 
     private initClient(data: InitMessage, sender: WebSocket) {
         this.clients.setClient(data.name, sender);
-        sender.send(JSON.stringify({ message: 'Connected' }));
+        sender.send(
+            JSON.stringify({ type: 'init', data: { message: 'Connected' } })
+        );
     }
 
     private handleSessionMessage(data: SessionMessage, sender: WebSocket) {
@@ -177,19 +182,9 @@ export class WsServer {
 
     private sendChatMessage(data: ChatMessage, sender: WebSocket) {
         if (this.checkSender(sender)) {
-            sender.send(
-                JSON.stringify({
-                    type: 'chat',
-                    data: data,
-                })
-            );
+            sender.send(JSON.stringify(data));
             const repicient = this.clients.getWs(data.repicientName);
-            repicient?.send(
-                JSON.stringify({
-                    type: 'chat',
-                    data: data,
-                })
-            );
+            repicient?.send(JSON.stringify(data));
         }
     }
 
@@ -224,18 +219,34 @@ export class WsServer {
         const opponent = this.findOpponent(data, sender)?.ws;
         if (data.stage === 'new game') {
             const session = this.sessions.get(data.sessionID);
-            const game = this.setNewGame(
-                data.game,
-                session?.config as GameData
-            );
-            if (session && game && opponent) {
-                session.gameObject = game;
-                sender.send(
-                    JSON.stringify({ message: 'new game is initialized' })
+            if (session) {
+                const game = this.setNewGame(
+                    data.game,
+                    session?.config as GameData
                 );
-                opponent.send(
-                    JSON.stringify({ message: 'new game is initialized' })
-                );
+                if (game) {
+                    this.sessions.set(data.sessionID, {
+                        ...session,
+                        isReady: {},
+                        gameObject: game,
+                    });
+                    if (game && opponent) {
+                        session.gameObject = game;
+                        sender.send(
+                            JSON.stringify({
+                                type: 'game',
+                                data: { stage: 'new game' },
+                            })
+                        );
+                        opponent.send(
+                            JSON.stringify({
+                                type: 'game',
+                                data: { stage: 'new game' },
+                            })
+                        );
+                        return;
+                    }
+                }
             }
         }
         if (this.checkSender(sender) && opponent !== undefined) {

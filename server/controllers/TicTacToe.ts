@@ -8,9 +8,12 @@ interface Position {
 type Turn = 'x' | 'o';
 
 export interface TicTacToeData {
+    stage?: string;
     gridSize?: number;
     position?: Position;
     turn?: Turn;
+    isWinner?: boolean;
+    winPositions?: Array<Position>;
 }
 
 export class TicTacToe extends Game {
@@ -24,15 +27,18 @@ export class TicTacToe extends Game {
 
     playGame(data: TicTacToeData, stage: string) {
         if (stage === 'start') {
-            return this.startGame();
+            return this.startGame(stage);
         } else {
             return this.continueGame(data);
         }
     }
-    private startGame() {
-        const sender = Math.floor(Math.random()) === 1 ? 'x' : 'o';
+    private startGame(stage: string) {
+        const sender = Math.floor(Math.random() * 2) === 1 ? 'x' : 'o';
         const rest = sender === 'x' ? 'o' : 'x';
-        return { sender: sender, rest: rest } as SensitiveData;
+        return {
+            sender: { turn: sender, stage: stage },
+            rest: { turn: rest, stage: stage },
+        } as SensitiveData;
     }
 
     private continueGame(data: TicTacToeData) {
@@ -46,77 +52,128 @@ export class TicTacToe extends Game {
         const winPossible =
             this.matrix.elements.length >= this.winSequence * 2 - 1;
         if (winPossible) {
+            console.log('win is possible', this.winSequence);
+
+            const { isWinner, winPositions } = this.checkIsWinner(turn, {
+                row,
+                col,
+            });
             return {
+                stage: 'game',
                 turn: turn,
-                isWinner: this.checkIsWinner(turn, { row, col }),
-            };
+                position: { row, col },
+                isWinner: isWinner,
+                winPositions: winPositions,
+            } as TicTacToeData;
         }
-        return { turn: turn, isWinner: false };
+        return {
+            stage: 'game',
+            turn: turn,
+            position: { row, col },
+            isWinner: false,
+        };
     }
 
     private checkIsWinner(turn: Turn, { row, col }: Position) {
-        return (
-            this.checkColumn(turn, { row, col }) ||
-            this.checkRow(turn, { row, col }) ||
-            this.checkRisingDiagonal(turn, { row, col }) ||
-            this.checkDescendingDiagonal(turn, { row, col })
-        );
+        const checkingFunctions = [
+            this.checkColumn.bind(this),
+            this.checkRow.bind(this),
+            this.checkRisingDiagonal.bind(this),
+            this.checkDescendingDiagonal.bind(this),
+        ];
+        let result;
+        for (let i = 0; i < checkingFunctions.length; i++) {
+            result = checkingFunctions[i](turn, { row, col });
+            console.log('result', result);
+            if (result.isWinner) {
+                console.log('winner', result.winPositions);
+                break;
+            }
+        }
+        return result ? result : { isWinner: false, winPositions: [] };
     }
     private checkColumn(turn: Turn, { row, col }: Position) {
-        let counter = 0;
+        let winPositions = [{ row, col }];
+        console.log(this.winSequence);
         for (let i = 1; i <= this.winSequence; i++) {
+            console.log('element', this.matrix.getElement(row + i, col));
             if (this.matrix.getElement(row + i, col) === turn) {
-                counter++;
-            } else break;
+                winPositions.push({ row: row + i, col });
+                console.log('win positions', winPositions);
+            } else {
+                break;
+            }
         }
         for (let i = 1; i <= this.winSequence; i++) {
             if (this.matrix.getElement(row - i, col) === turn) {
-                counter++;
-            } else break;
+                winPositions.push({ row: row - i, col });
+            } else {
+                break;
+            }
         }
-        return counter === this.winSequence ? true : false;
+        return winPositions.length === this.winSequence
+            ? { isWinner: true, winPositions: winPositions }
+            : { isWinner: false };
     }
     private checkRow(turn: Turn, { row, col }: Position) {
-        let counter = 0;
+        let winPositions = [{ row, col }];
         for (let i = 1; i <= this.winSequence; i++) {
             if (this.matrix.getElement(row, col + i) === turn) {
-                counter++;
-            } else break;
+                winPositions.push({ row, col: col + i });
+            } else {
+                break;
+            }
         }
         for (let i = 1; i <= this.winSequence; i++) {
             if (this.matrix.getElement(row, col - i) === turn) {
-                counter++;
-            } else break;
+                winPositions.push({ row, col: col - i });
+            } else {
+                break;
+            }
         }
-        return counter === this.winSequence ? true : false;
+        return winPositions.length === this.winSequence
+            ? { isWinner: true, winPositions: winPositions }
+            : { isWinner: false };
     }
     private checkRisingDiagonal(turn: Turn, { row, col }: Position) {
-        let counter = 0;
+        let winPositions = [{ row, col }];
         for (let i = 1; i <= this.winSequence; i++) {
             if (this.matrix.getElement(row + i, col + i) === turn) {
-                counter++;
-            } else break;
+                winPositions.push({ row: row + i, col: col + i });
+            } else {
+                break;
+            }
         }
         for (let i = 1; i <= this.winSequence; i++) {
             if (this.matrix.getElement(row - i, col - i) === turn) {
-                counter++;
-            } else break;
+                winPositions.push({ row: row - i, col: col - i });
+            } else {
+                break;
+            }
         }
-        return counter === this.winSequence ? true : false;
+        return winPositions.length === this.winSequence
+            ? { isWinner: true, winPositions: winPositions }
+            : { isWinner: false };
     }
     private checkDescendingDiagonal(turn: Turn, { row, col }: Position) {
-        let counter = 0;
+        let winPositions = [{ row, col }];
         for (let i = 1; i <= this.winSequence; i++) {
             if (this.matrix.getElement(row + i, col - i) === turn) {
-                counter++;
-            } else break;
+                winPositions.push({ row: row + i, col: col - i });
+            } else {
+                break;
+            }
         }
         for (let i = 1; i <= this.winSequence; i++) {
             if (this.matrix.getElement(row - i, col + i) === turn) {
-                counter++;
-            } else break;
+                winPositions.push({ row: row - i, col: col + i });
+            } else {
+                break;
+            }
         }
-        return counter === this.winSequence ? true : false;
+        return winPositions.length === this.winSequence
+            ? { isWinner: true, winPositions: winPositions }
+            : { isWinner: false };
     }
 
     private setWinSequence(gridSize: number | undefined) {
