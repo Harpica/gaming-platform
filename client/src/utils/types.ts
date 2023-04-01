@@ -77,7 +77,7 @@ export interface Session {
     isHost?: boolean;
 }
 
-export type Game = 'Tic-Tac-Toe' | 'none';
+export type Game = 'Tic-Tac-Toe' | 'Tsoro Yematatu' | 'none';
 
 export type GameObject = TicTacToe;
 

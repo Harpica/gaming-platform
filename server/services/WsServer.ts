@@ -2,6 +2,7 @@ import { IncomingMessage, ServerResponse, Server } from 'http';
 import { WebSocket, WebSocketServer } from 'ws';
 import { isSensitiveData } from '../controllers/Game';
 import { TicTacToe, TicTacToeData } from '../controllers/TicTacToe';
+import { TsoroYematatu, TsoroYematatuData } from '../controllers/TsoroYematatu';
 import { Clients } from '../utils/Clients';
 import { uid } from '../utils/utils';
 
@@ -49,11 +50,11 @@ interface GameMessage {
     data: GameData;
 }
 
-type Game = 'Tic-Tac-Toe';
+type Game = 'Tic-Tac-Toe' | 'TsoroYematatu';
 
-type GameObject = TicTacToe;
+type GameObject = TicTacToe | TsoroYematatu;
 
-type GameData = TicTacToeData;
+type GameData = TicTacToeData | TsoroYematatuData;
 
 export interface Session {
     host: string;
@@ -270,7 +271,10 @@ export class WsServer {
     private setNewGame(game: Game, config: GameData) {
         switch (game) {
             case 'Tic-Tac-Toe':
-                return new TicTacToe(config.gridSize as number);
+                const TicTacToeConfig = config as TicTacToeData;
+                return new TicTacToe(TicTacToeConfig.gridSize as number);
+            case 'TsoroYematatu':
+                return new TsoroYematatu();
 
             default:
                 break;

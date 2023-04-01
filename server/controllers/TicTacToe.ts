@@ -1,11 +1,11 @@
 import { Matrix } from '../utils/Matrix';
 import { Game, SensitiveData } from './Game';
 
-interface Position {
+export interface Position {
     row: number;
     col: number;
 }
-type Turn = 'x' | 'o';
+export type Turn = 'x' | 'o';
 
 export interface TicTacToeData {
     stage?: string;
