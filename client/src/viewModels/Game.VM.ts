@@ -1,6 +1,8 @@
 import { makeAutoObservable } from 'mobx';
 import { TicTacToe } from '../utils/TicTacToe';
 import {
+    Game,
+    GameData,
     GameMessage,
     GameMessageResponse,
     GameObject,
@@ -8,10 +10,12 @@ import {
     ReadinessMessageResponse,
     Session,
     SessionMessageResponse,
+    TicTacToeData,
 } from '../utils/types';
 import { WS } from '../utils/WS';
 import { NavigateFunction } from 'react-router';
 import { DEFAULT_SESSION } from '../utils/constants';
+import { TsoroYematatu } from '../utils/TsoroYematatu';
 
 export class GameVM {
     currentUser: string;
@@ -79,6 +83,7 @@ export class GameVM {
     }
 
     private readyMessageHandler(message: ReadinessMessageResponse) {
+        console.log('ready');
         this.setSession({
             ...this.session,
             isReady: {
@@ -93,33 +98,46 @@ export class GameVM {
                 [message.data.name]: message.data.isReady,
             },
         };
+        console.log(this.session.isReady);
         this.checkIfReady();
     }
 
     private gameMessageHandler(message: GameMessageResponse) {
         if (message.data.stage === 'start') {
-            if ((this.session.game = 'Tic-Tac-Toe')) {
+            if (this.session.game === 'Tic-Tac-Toe') {
+                const TicTacToeConfig = this.session.config as TicTacToeData;
                 this.game = new TicTacToe(
-                    this.session.config.gridSize!,
+                    TicTacToeConfig.gridSize!,
+                    message.data.turn!,
+                    this.session.sessionID,
+                    this.ws
+                );
+            } else if ((this.session.game = 'Tsoro Yematatu')) {
+                this.game = new TsoroYematatu(
                     message.data.turn!,
                     this.session.sessionID,
                     this.ws
                 );
             }
             this.isStarted = true;
-        } else if (message.data.stage === 'game') {
-            if ((this.session.game = 'Tic-Tac-Toe')) {
-                this.game!.handleWsGameMessage(
-                    message,
-                    this.currentUser,
-                    this.opponent
-                );
-            }
         } else if (message.data.stage === 'new game') {
             this.game = null;
             this.isAllReady = false;
             this.isStarted = false;
             this.session.isReady = {};
+        } else {
+            // if (
+            //     this.session.game === 'Tic-Tac-Toe' &&
+            //     this.game instanceof TicTacToe
+            // ) {
+            this.game!.handleWsGameMessage(
+                message,
+                this.currentUser,
+                this.opponent
+            );
+            // } else if ( this.session.game === 'Tsoro Yematatu' && this.game instanceof TsoroYematatu ) {
+
+            // }
         }
     }
 
@@ -150,14 +168,13 @@ export class GameVM {
     }
 
     startGame() {
+        const TicTacToeConfig = this.session.config as TicTacToeData;
         const message: GameMessage = {
             type: 'game',
             stage: 'start',
             game: this.session.game,
             sessionID: this.session.sessionID,
-            data: {
-                gridSize: this.session.config.gridSize,
-            },
+            data: TicTacToeConfig,
         };
         this.ws.sendMessage(message);
     }
@@ -167,7 +184,7 @@ export class GameVM {
             type: 'game',
             stage: 'new game',
             sessionID: this.session.sessionID,
-            game: 'Tic-Tac-Toe',
+            game: this.session.game,
             data: {},
         };
         this.ws.sendMessage(message);

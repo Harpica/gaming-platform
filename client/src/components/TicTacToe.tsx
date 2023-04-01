@@ -1,27 +1,29 @@
 import { observer } from 'mobx-react-lite';
+import { TicTacToe } from '../utils/TicTacToe';
 import { ViewChildProps } from '../utils/types';
 import { GameVM } from '../viewModels/Game.VM';
 
-const TicTacToe: React.FC<ViewChildProps<GameVM>> = observer(({ vm }) => {
+const TicTacToeView: React.FC<ViewChildProps<GameVM>> = observer(({ vm }) => {
+    const game = vm.game as TicTacToe;
     return (
         <div className='w-full flex items-center justify-center'>
             <div className='flex flex-col gap-3 bg-white text-black rounded shadow-md max-w-[600px] w-[70%] p-4'>
-                {vm.game?.winner ? (
+                {game.winner ? (
                     <p className='font-bold text-center text-lg'>
-                        {vm.game?.winner} win!
+                        {game.winner} win!
                     </p>
                 ) : (
                     <p className='font-bold text-center text-lg'>
-                        {vm.game?.currentTurn === vm.game?.userTurn
+                        {game.currentTurn === game.userTurn
                             ? 'Your turn'
                             : "Opponent's turn"}
                     </p>
                 )}
                 <p className='font-bold text-center text-lg'>
-                    You are {vm.game?.userTurn}
+                    You are {game.userTurn}
                 </p>
                 <button
-                    disabled={!(vm.session.isHost && vm.game?.winner)}
+                    disabled={!(vm.session.isHost && game.winner)}
                     type='button'
                     onClick={() => {
                         vm.startNewGame();
@@ -32,28 +34,28 @@ const TicTacToe: React.FC<ViewChildProps<GameVM>> = observer(({ vm }) => {
                 </button>
                 <div
                     className={`grid ${
-                        vm.game?.matrix.size === 3 && ' grid-cols-3 grid-rows-3'
-                    } ${
-                        vm.game?.matrix.size === 5 && ' grid-cols-5 grid-rows-5'
-                    } ${
-                        vm.game?.matrix.size === 7 && ' grid-cols-7 grid-rows-7'
+                        game.matrix.size === 3 && ' grid-cols-3 grid-rows-3'
+                    } ${game.matrix.size === 5 && ' grid-cols-5 grid-rows-5'} ${
+                        game.matrix.size === 7 && ' grid-cols-7 grid-rows-7'
                     } self-center gap-[2px] bg-indigo-500`}
                 >
-                    {vm.game?.matrix.elements.map((element, i) => (
+                    {game.matrix.elements.map((element, i) => (
                         <button
                             disabled={
-                                vm.game?.currentTurn !== vm.game?.userTurn ||
-                                vm.game?.stage === 'end'
+                                game.currentTurn !== game.userTurn ||
+                                game.stage === 'end'
                             }
                             type='button'
                             value={i}
                             key={'TicTacToe' + i}
                             onClick={(e) => {
-                                vm.game!.handleUserTurn(e);
+                                game.handleUserTurn(e);
                             }}
-                            className={
-                                'enabled:hover:opacity-60 enabled:cursor-pointer w-12 h-12 bg-white '
-                            }
+                            className={`enabled:hover:opacity-60 enabled:cursor-pointer w-12 h-12  ${
+                                game.checkIfIndexIsInWinArray(i)
+                                    ? 'bg-blue-200'
+                                    : 'bg-white'
+                            }`}
                         >
                             {element}
                         </button>
@@ -64,4 +66,4 @@ const TicTacToe: React.FC<ViewChildProps<GameVM>> = observer(({ vm }) => {
     );
 });
 
-export default TicTacToe;
+export default TicTacToeView;

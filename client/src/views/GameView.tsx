@@ -1,5 +1,5 @@
 import ReadyCheck from '../components/ReadyCheck';
-import TicTacToe from '../components/TicTacToe';
+import TicTacToeView from '../components/TicTacToe';
 import { useNavigate } from 'react-router';
 import Chat from './ChatView';
 import { observer } from 'mobx-react-lite';
@@ -7,7 +7,7 @@ import { Session } from '../utils/types';
 import { ws } from '../utils/WS';
 import { GameVM } from '../viewModels/Game.VM';
 import { useMemo } from 'react';
-import TsoroYematatu from '../components/TsoroYematatu';
+import TsoroYematatuView from '../components/TsoroYematatu';
 
 interface GameViewProps {
     currentUser: string;
@@ -46,11 +46,13 @@ const GameView: React.FC<GameViewProps> = observer(
                     >
                         Exit
                     </button>
-                    {/* {!vm.isStarted && <ReadyCheck vm={vm} />}
+                    {!vm.isStarted && <ReadyCheck vm={vm} />}
                     {vm.isStarted && vm.session.game === 'Tic-Tac-Toe' && (
-                        <TicTacToe vm={vm} />
-                    )} */}
-                    <TsoroYematatu vm={vm} />
+                        <TicTacToeView vm={vm} />
+                    )}
+                    {vm.isStarted && vm.session.game === 'Tsoro Yematatu' && (
+                        <TsoroYematatuView vm={vm} />
+                    )}
                 </div>
             </div>
         );

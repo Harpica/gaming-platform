@@ -1,6 +1,12 @@
 import { makeAutoObservable } from 'mobx';
 import { Matrix } from './Matrix';
-import { GameMessage, GameMessageResponse, Position, Turn } from './types';
+import {
+    GameMessage,
+    GameMessageResponse,
+    Position,
+    TicTacToeData,
+    Turn,
+} from './types';
 import { WS } from './WS';
 
 export class TicTacToe {
@@ -22,7 +28,7 @@ export class TicTacToe {
         makeAutoObservable(this);
     }
 
-    fillMatrix() {
+    private fillMatrix() {
         for (let i = 0; i < this.matrix.size ** 2; i++) {
             this.matrix.elements.push('');
         }
@@ -45,7 +51,7 @@ export class TicTacToe {
             data: {
                 turn: this.currentTurn,
                 position: position,
-            },
+            } as TicTacToeData,
         };
         this.ws.sendMessage(message);
         this.changeCurrentTurn();
@@ -60,24 +66,30 @@ export class TicTacToe {
         currentUser: string,
         opponent: string
     ) {
-        if (message.data.stage === 'game') {
-            if (message.data.isWinner) {
-                console.log(
-                    'winner!',
-                    message.data.isWinner,
-                    message.data.winPositions
-                );
+        const data = message.data as TicTacToeData;
+        if (data.stage === 'game') {
+            if (data.isWinner) {
+                console.log('winner!', data.isWinner, data.winPositions);
                 this.winner =
-                    this.userTurn === message.data.turn
-                        ? currentUser
-                        : opponent;
-                this.winPositions = message.data.winPositions!;
+                    this.userTurn === data.turn ? currentUser : opponent;
+                this.winPositions = data.winPositions!;
                 this.stage = 'end';
             }
-            this.setTurnValue(message.data.turn!, message.data.position!);
-            if (message.data.turn !== this.userTurn) {
+            this.setTurnValue(data.turn!, data.position!);
+            if (data.turn !== this.userTurn) {
                 this.changeCurrentTurn();
             }
         }
+    }
+
+    checkIfIndexIsInWinArray(index: number) {
+        return this.winPositions.find((element) => {
+            return (
+                element.col === this.matrix.getPosition(index).col &&
+                element.row === this.matrix.getPosition(index).row
+            );
+        }) !== undefined
+            ? true
+            : false;
     }
 }

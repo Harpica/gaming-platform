@@ -1,6 +1,5 @@
-import { GameVM } from '../viewModels/Game.VM';
-import { MainVM } from '../viewModels/Main.VM';
 import { TicTacToe } from './TicTacToe';
+import { TsoroYematatu } from './TsoroYematatu';
 
 export type Message =
     | InitMessage
@@ -79,9 +78,9 @@ export interface Session {
 
 export type Game = 'Tic-Tac-Toe' | 'Tsoro Yematatu' | 'none';
 
-export type GameObject = TicTacToe;
+export type GameObject = TicTacToe | TsoroYematatu;
 
-export type GameData = TicTacToeData;
+export type GameData = TicTacToeData | TsoroYematatuData;
 
 export interface Position {
     row: number;
@@ -96,6 +95,15 @@ export interface TicTacToeData {
     turn?: Turn;
     isWinner?: boolean;
     winPositions?: Array<Position>;
+}
+
+export interface TsoroYematatuData {
+    stage?: string;
+    turn?: Turn;
+    newPositionIndex?: number;
+    prevPositionIndex?: number;
+    isWinner?: boolean;
+    winIndexes?: Array<Array<number>>;
 }
 
 export interface ViewChildProps<T> {

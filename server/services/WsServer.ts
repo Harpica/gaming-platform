@@ -50,7 +50,7 @@ interface GameMessage {
     data: GameData;
 }
 
-type Game = 'Tic-Tac-Toe' | 'TsoroYematatu';
+type Game = 'Tic-Tac-Toe' | 'Tsoro Yematatu';
 
 type GameObject = TicTacToe | TsoroYematatu;
 
@@ -273,7 +273,7 @@ export class WsServer {
             case 'Tic-Tac-Toe':
                 const TicTacToeConfig = config as TicTacToeData;
                 return new TicTacToe(TicTacToeConfig.gridSize as number);
-            case 'TsoroYematatu':
+            case 'Tsoro Yematatu':
                 return new TsoroYematatu();
 
             default:

@@ -69,6 +69,12 @@ export class MainVM {
             .catch((err) => console.log(err));
     }
 
+    setConfig(game: Game, config: GameData) {
+        if (game === 'Tic-Tac-Toe') {
+            this.session.config = config;
+        }
+    }
+
     loginUser(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         const name = (
