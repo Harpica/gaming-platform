@@ -25,7 +25,7 @@ const Chat: React.FC<ChatProps> = observer(({ currentUser, opponent }) => {
                 {vm.messages.map((message, i) => (
                     <li
                         key={`message-${i}`}
-                        className={`rounded shadow-md p-3 ${
+                        className={`rounded shadow-md p-3 break-words ${
                             message.sender === vm.currentUser
                                 ? ' bg-indigo-400 ml-3'
                                 : 'bg-blue-400 mr-3'
@@ -34,12 +34,6 @@ const Chat: React.FC<ChatProps> = observer(({ currentUser, opponent }) => {
                         {message.body}
                     </li>
                 ))}
-                {/* <li className='bg-indigo-400 rounded shadow-md p-3 ml-3'>
-                    Some message
-                </li>
-                <li className='bg-blue-400 rounded shadow-md p-3 mr-3'>
-                    Some message Very very very very big message it is
-                </li> */}
             </ul>
             <form
                 className='self-center flex flex-row justify-between'
