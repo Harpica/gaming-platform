@@ -7,6 +7,7 @@ import { Session } from '../utils/types';
 import { ws } from '../utils/WS';
 import { GameVM } from '../viewModels/Game.VM';
 import { useMemo } from 'react';
+import TsoroYematatu from '../components/TsoroYematatu';
 
 interface GameViewProps {
     currentUser: string;
@@ -45,10 +46,11 @@ const GameView: React.FC<GameViewProps> = observer(
                     >
                         Exit
                     </button>
-                    {!vm.isStarted && <ReadyCheck vm={vm} />}
+                    {/* {!vm.isStarted && <ReadyCheck vm={vm} />}
                     {vm.isStarted && vm.session.game === 'Tic-Tac-Toe' && (
                         <TicTacToe vm={vm} />
-                    )}
+                    )} */}
+                    <TsoroYematatu vm={vm} />
                 </div>
             </div>
         );
