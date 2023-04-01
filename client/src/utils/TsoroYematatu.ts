@@ -52,9 +52,10 @@ export class TsoroYematatu {
     ) {
         const data = message.data as TsoroYematatuData;
         this.setTurnValue(data.turn!, data.newPositionIndex!);
-        if (data.prevPositionIndex) {
+        console.log('hanlseMes prev index', data.prevPositionIndex);
+        if (data.prevPositionIndex !== undefined) {
             console.log(data.prevPositionIndex);
-            this.setTurnValue('' as const, data.prevPositionIndex);
+            this.setTurnValue('', data.prevPositionIndex);
         }
         if (data.isWinner) {
             console.log('winner!', data.isWinner, data.winIndexes);
@@ -72,20 +73,21 @@ export class TsoroYematatu {
         console.log(this.stage);
         const index = parseInt(e.currentTarget.value);
         if (this.stage === 'setting') {
-            console.log('handle turn', this.stage, this.elements);
-            this.setTurnValue(this.userTurn, index);
-            const message: GameMessage = {
-                type: 'game',
-                stage: this.stage,
-                game: 'Tsoro Yematatu',
-                sessionID: this.sessionID,
-                data: {
-                    turn: this.currentTurn,
-                    newPositionIndex: index,
-                } as TsoroYematatuData,
-            };
-            this.ws.sendMessage(message);
-            this.changeCurrentTurn();
+            if (this.elements[index].value === '') {
+                this.setTurnValue(this.userTurn, index);
+                const message: GameMessage = {
+                    type: 'game',
+                    stage: this.stage,
+                    game: 'Tsoro Yematatu',
+                    sessionID: this.sessionID,
+                    data: {
+                        turn: this.currentTurn,
+                        newPositionIndex: index,
+                    } as TsoroYematatuData,
+                };
+                this.ws.sendMessage(message);
+                this.changeCurrentTurn();
+            }
         } else if (this.stage === 'moving') {
             if (this.prevIndex === -1 && this.elements[index].value !== '') {
                 this.prevIndex = index;

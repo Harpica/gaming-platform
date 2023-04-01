@@ -80,6 +80,8 @@ export class TsoroYematatu extends Game {
             if (
                 (this.elements[newIndex].col === 0 &&
                     this.elements[newIndex].row === 0) ||
+                (this.elements[prevIndex].col === 0 &&
+                    this.elements[prevIndex].row === 0) ||
                 this.elements[newIndex].col === this.elements[prevIndex].col ||
                 this.elements[newIndex].row === this.elements[prevIndex].row
             ) {

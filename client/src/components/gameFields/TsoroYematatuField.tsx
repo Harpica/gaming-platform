@@ -35,12 +35,16 @@ const TsoroYematatuField: React.FC<ViewChildProps<GameVM>> = observer(
                                 game.handleUserTurn(e);
                                 console.log(game.elements.slice());
                             }}
-                            className={`rounded-full w-8 h-8 self-center text-white
+                            className={`rounded-full w-8 h-8 self-center text-white enabled:hover:bg-violet-500 text-center pb-[3px] border-black border-[1px]
                                 ${buttonsStyles[i]}
                                 ${
                                     game.checkIfIndexIsInWinArray(i)
                                         ? 'bg-green-600'
-                                        : ' bg-blue-600'
+                                        : element.value === 'x'
+                                        ? 'bg-blue-600'
+                                        : element.value === 'o'
+                                        ? 'bg-indigo-600'
+                                        : 'bg-white '
                                 }
                             `}
                         >
