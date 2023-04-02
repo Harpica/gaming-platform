@@ -5,6 +5,7 @@ import { makeAutoObservable } from 'mobx';
 export class WS {
     ws: WebSocket | null = null;
     messageHandler: MessageHandler = {};
+    pingTimeout: NodeJS.Timeout | undefined;
     constructor() {
         makeAutoObservable(this);
     }
@@ -27,9 +28,10 @@ export class WS {
             this.ws!.send(data);
         };
     }
+
     listenToMessages() {
         this.ws!.onmessage = (e) => {
-            const data = JSON.parse(e.data);
+            const data = JSON.parse(e.data as string);
             if (data.error) {
                 console.log(data.error);
             } else {

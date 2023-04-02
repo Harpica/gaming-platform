@@ -26,6 +26,13 @@ const AuthForm: React.FC<ViewChildProps<MainVM>> = observer(({ vm }) => {
                         className='shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-blue-300 '
                         placeholder='Your name'
                     />
+                    <p
+                        className={`text-xs text-black ${
+                            vm.isNameUnique ? 'invisible' : 'visible'
+                        }`}
+                    >
+                        {'This name is already occupied'}
+                    </p>
                 </div>
 
                 <div className='pt-7 flex flex-col gap-3'>

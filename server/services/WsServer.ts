@@ -65,10 +65,15 @@ export interface Session {
     isReady: { [key: string]: boolean };
 }
 
+interface WS extends WebSocket {
+    isAlive: boolean;
+}
+
 export class WsServer {
     private wss: WebSocketServer;
     private clients: Clients;
     private sessions: Map<string, Session>;
+    private interval: NodeJS.Timer;
 
     constructor(
         server: Server<typeof IncomingMessage, typeof ServerResponse>,
@@ -77,14 +82,18 @@ export class WsServer {
         this.wss = new WebSocketServer({ server });
         this.clients = new Clients();
         this.sessions = sessions;
+        this.interval = this.setInterval(this.wss);
     }
 
     start() {
-        this.wss.on('connection', (client: WebSocket) => {
+        this.wss.on('connection', (client: WS) => {
+            client.isAlive = true;
+            client.on('pong', () => this.heartbeat(client));
             client.on('message', (message: Buffer) => {
                 this.handleWsMessage(message, client);
             });
             client.on('close', () => {
+                clearInterval(this.interval);
                 this.clients.deleteClientByWs(client);
                 this.sessions.forEach((session, key) => {
                     if (this.clients.getWs(session.host) === client) {
@@ -93,6 +102,22 @@ export class WsServer {
                 });
             });
         });
+    }
+
+    private heartbeat(ws: WS) {
+        ws.isAlive = true;
+    }
+
+    private setInterval(wss: WebSocketServer) {
+        return setInterval(function ping() {
+            wss.clients.forEach(function each(ws) {
+                const webSocket = ws as WS;
+                if (webSocket.isAlive === false) return ws.terminate();
+
+                webSocket.isAlive = false;
+                webSocket.ping();
+            });
+        }, 30000);
     }
 
     private handleWsMessage(message: Buffer, client: WebSocket) {

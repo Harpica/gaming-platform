@@ -1,4 +1,4 @@
-import { makeAutoObservable } from 'mobx';
+import { action, makeAutoObservable } from 'mobx';
 import { LOGIN_STEPS } from '../utils/constants';
 import {
     Game,
@@ -19,10 +19,11 @@ export class MainVM {
     session: Session;
     setSession: React.Dispatch<React.SetStateAction<Session>>;
     setIsAuth: React.Dispatch<React.SetStateAction<boolean>>;
-    sessions: Array<Session>;
+    sessions: Array<Session> = [];
     ws: WS;
     api: Api;
     navigate: NavigateFunction;
+    isNameUnique: boolean;
     constructor(
         currentUser: string,
         setCurrentUser: React.Dispatch<React.SetStateAction<string>>,
@@ -40,13 +41,23 @@ export class MainVM {
         this.session = session;
         this.setSession = setSession.bind(this);
         this.setIsAuth = setIsAuth;
-        this.sessions = [];
         this.ws = ws;
         this.api = api;
         this.navigate = navigate.bind(this);
         this.handleNext = this.handleNext.bind(this);
-        console.log('rendr');
+        this.isNameUnique = this.checkIfNameUnique('default') ?? true;
+        this.getSessions();
         makeAutoObservable(this);
+    }
+
+    private checkIfNameUnique(name: string) {
+        if (this.sessions !== undefined) {
+            return this.sessions.find((session) => {
+                return session.guest === name || session.host === name;
+            })
+                ? false
+                : true;
+        }
     }
 
     handleNext() {
@@ -62,11 +73,12 @@ export class MainVM {
     getSessions() {
         this.api
             .getSessions()
-            .then((response) => {
-                console.log(response.data);
-                this.sessions = response.data;
-            })
-            .catch((err) => console.log(err));
+            .then(
+                action((response) => {
+                    this.sessions = response.data;
+                })
+            )
+            .catch(action((err) => console.log(err)));
     }
 
     setConfig(game: Game, config: GameData) {
@@ -80,14 +92,18 @@ export class MainVM {
         const name = (
             e.currentTarget.elements.namedItem('name') as HTMLInputElement
         ).value;
-        this.ws.setWSConnection(name);
-        this.ws.addFunctionToMessageHandler('init', () => {
-            console.log('connected');
-        });
-        this.ws.listenToMessages();
-        this.currentUser = name;
-        this.setCurrentUser(name);
-        this.handleNext();
+        this.checkIfNameUnique(name);
+        console.log(this.sessions, this.checkIfNameUnique(name));
+        if (this.isNameUnique === true) {
+            this.ws.setWSConnection(name);
+            this.ws.addFunctionToMessageHandler('init', () => {
+                console.log('connected');
+            });
+            this.ws.listenToMessages();
+            this.currentUser = name;
+            this.setCurrentUser(name);
+            this.handleNext();
+        }
     }
 
     handleCreateOrJoinChoice(value: boolean) {
