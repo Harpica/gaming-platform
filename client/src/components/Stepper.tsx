@@ -14,7 +14,6 @@ import Sessions from './Sessions';
 import { MainVM } from '../viewModels/Main.VM';
 
 const LoginStepper: React.FC<ViewChildProps<MainVM>> = observer(({ vm }) => {
-    console.log(vm.session.isHost);
     return (
         <>
             <Box className='w-full h-full  grid grid-rows-[minmax(50px,max-content)_1fr]'>

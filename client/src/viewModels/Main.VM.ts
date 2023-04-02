@@ -93,7 +93,6 @@ export class MainVM {
             e.currentTarget.elements.namedItem('name') as HTMLInputElement
         ).value;
         this.checkIfNameUnique(name);
-        console.log(this.sessions, this.checkIfNameUnique(name));
         if (this.isNameUnique === true) {
             this.ws.setWSConnection(name);
             this.ws.addFunctionToMessageHandler('init', () => {
@@ -114,7 +113,6 @@ export class MainVM {
 
     handleGameChoice(game: Game, options: GameData) {
         this.session = { ...this.session, game: game, config: options };
-        console.log(this.session.config);
         const message: SessionMessage = {
             type: 'session',
             isHost: this.session.isHost as boolean,

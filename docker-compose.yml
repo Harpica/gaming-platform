@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+
+  node:
+    container_name: gaming-platform-node
+    build: ./server
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - $PORT:$PORT
+    expose:
+      - $PORT
+    environment:
+      - PORT=$PORT
+    networks:
+      - frontend
+
+  react:
+    container_name: gaming-platform-react
+    depends_on:
+      - node
+    build:
+      context: ./client
+    ports:
+      - 3003:80
+    networks:
+      - frontend
+
+networks:
+  frontend:

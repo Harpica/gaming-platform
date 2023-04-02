@@ -69,7 +69,6 @@ export class TicTacToe {
         const data = message.data as TicTacToeData;
         if (data.stage === 'game') {
             if (data.isWinner) {
-                console.log('winner!', data.isWinner, data.winPositions);
                 this.winner =
                     this.userTurn === data.turn ? currentUser : opponent;
                 this.winPositions = data.winPositions!;

@@ -38,7 +38,6 @@ export class TsoroYematatu {
     }
 
     private setTurnValue(value: Turn | '', index: number) {
-        console.log('setting value', this.elements[index].value, index);
         this.elements[index].value = value;
     }
     private changeCurrentTurn() {
@@ -52,13 +51,10 @@ export class TsoroYematatu {
     ) {
         const data = message.data as TsoroYematatuData;
         this.setTurnValue(data.turn!, data.newPositionIndex!);
-        console.log('hanlseMes prev index', data.prevPositionIndex);
         if (data.prevPositionIndex !== undefined) {
-            console.log(data.prevPositionIndex);
             this.setTurnValue('', data.prevPositionIndex);
         }
         if (data.isWinner) {
-            console.log('winner!', data.isWinner, data.winIndexes);
             this.winner = this.userTurn === data.turn ? currentUser : opponent;
             this.winIndexes = data.winIndexes!;
             this.stage = 'end';
@@ -70,7 +66,6 @@ export class TsoroYematatu {
 
     handleUserTurn(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
         this.setStage();
-        console.log(this.stage);
         const index = parseInt(e.currentTarget.value);
         if (this.stage === 'setting') {
             if (this.elements[index].value === '') {

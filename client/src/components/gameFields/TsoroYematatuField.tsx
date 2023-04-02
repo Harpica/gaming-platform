@@ -33,7 +33,6 @@ const TsoroYematatuField: React.FC<ViewChildProps<GameVM>> = observer(
                             value={i}
                             onClick={(e) => {
                                 game.handleUserTurn(e);
-                                console.log(game.elements.slice());
                             }}
                             className={`rounded-full w-8 h-8 self-center text-white enabled:hover:bg-violet-500 text-center pb-[3px] border-black border-[1px]
                                 ${buttonsStyles[i]}

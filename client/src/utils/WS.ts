@@ -35,8 +35,6 @@ export class WS {
             if (data.error) {
                 console.log(data.error);
             } else {
-                console.log();
-                console.log(this.messageHandler[data.type]);
                 this.messageHandler[data.type](data);
             }
         };

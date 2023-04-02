@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
-import { Session, WsServer } from './services/WsServer';
+import { WsServer } from './services/WsServer';
 import { getSessions, sessions } from './controllers/Sessions';
 
 // Usage of .env file in the root dir

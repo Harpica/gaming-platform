@@ -26,18 +26,15 @@ export class ChatVM {
                 repicientName: this.opponent,
                 data: { sender: this.currentUser, body: chatMessageBody },
             };
-            console.log('message', message);
             this.ws.sendMessage(message);
         }
     }
     listenToMessages() {
         this.ws.addFunctionToMessageHandler('chat', (data: ChatMessage) => {
-            console.log(data);
             this.messages.push({
                 sender: data.data.sender,
                 body: data.data.body,
             });
-            console.log(this.messages);
         });
     }
     set addMessage(message: ChatMessageData) {

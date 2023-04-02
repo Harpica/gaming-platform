@@ -81,7 +81,6 @@ export class GameVM {
     }
 
     private readyMessageHandler(message: ReadinessMessageResponse) {
-        console.log('ready');
         this.setSession({
             ...this.session,
             isReady: {
@@ -96,7 +95,6 @@ export class GameVM {
                 [message.data.name]: message.data.isReady,
             },
         };
-        console.log(this.session.isReady);
         this.checkIfReady();
     }
 
@@ -155,7 +153,6 @@ export class GameVM {
             this.session.isReady[this.opponent]
         ) {
             this.isAllReady = true;
-            console.log('ready', this.isAllReady);
         }
     }
 

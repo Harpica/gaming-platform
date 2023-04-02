@@ -47,7 +47,6 @@ const ReadyCheck: React.FC<ViewChildProps<GameVM>> = observer(({ vm }) => {
                         disabled={!vm.isAllReady}
                         type='button'
                         onClick={(e) => {
-                            console.log(e.currentTarget);
                             vm.startGame();
                         }}
                         className='disabled:opacity-40 bg-gradient-to-r from-sky-500 to-indigo-500 p-2 pr-9 pl-9 self-center text-white uppercase  shadow-md rounded outline-none transition-all hover:opacity-80 '

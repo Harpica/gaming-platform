@@ -10,8 +10,8 @@ export class Matrix {
     }
 
     getElement(row: number, col: number) {
-        const index = this.getIndex(row, col);
-        if (this.checkIsValidIndex(index)) {
+        if (this.checkIsValidPosition(row, col)) {
+            const index = this.getIndex(row, col);
             return this.elements[index];
         } else return null;
     }
@@ -20,7 +20,10 @@ export class Matrix {
         this.elements[row * this.size + col] = element;
     }
 
-    private checkIsValidIndex(index: number) {
-        return index > 0 && index < this.size ** 2;
+    private checkIsValidPosition(row: number, col: number) {
+        if (row >= 0 && row < this.size && col >= 0 && col < this.size) {
+            return true;
+        }
+        return false;
     }
 }
