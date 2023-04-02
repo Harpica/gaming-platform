@@ -21,7 +21,7 @@ const Chat: React.FC<ChatProps> = observer(({ currentUser, opponent }) => {
 
     return (
         <div className='grid grid-rows-[minmax(250px,1fr)_60px] items-end bg-white overflow-hidden'>
-            <ul className='list-none flex flex-col gap-3 pb-4 overflow-auto h-fit max-h-[250px] md:max-h-full md:h-fit p-4'>
+            <ul className='list-none flex flex-col gap-3 pb-4 overflow-auto h-fit max-h-[250px] md:max-h-[calc(100vh-60px] md:h-fit p-4'>
                 {vm.messages.map((message, i) => (
                     <li
                         key={`message-${i}`}
