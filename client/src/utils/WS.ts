@@ -13,7 +13,9 @@ export class WS {
         this.sendInitMessage(name);
     }
     closeWSConnection() {
-        this.ws!.close();
+        if (this.ws !== null) {
+            this.ws!.close();
+        }
     }
     sendInitMessage(name: string) {
         this.ws!.onopen = () => {
