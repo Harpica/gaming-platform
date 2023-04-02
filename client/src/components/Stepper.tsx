@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Stepper from '@mui/material/Stepper';
+import MobileStepper from '@mui/material/MobileStepper';
 import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Button from '@mui/material/Button';
@@ -16,14 +17,16 @@ const LoginStepper: React.FC<ViewChildProps<MainVM>> = observer(({ vm }) => {
     console.log(vm.session.isHost);
     return (
         <>
-            <Box className='w-full h-full max-h-[calc(100vh-150px)] grid grid-rows-[50px_1fr]'>
+            <Box className='w-full h-full  grid grid-rows-[minmax(50px,max-content)_1fr]'>
                 <Stepper
-                    className='bg-white mr-[-50vw] pr-[50vw] ml-[-50vw] pl-[50vw] '
                     activeStep={vm.activeStep}
+                    className='text-xs  h-fit min-h-[50px] bg-white mr-[-50vw] pr-[50vw] ml-[-50vw] pl-[50vw] '
                 >
                     {vm.steps.map((label, index) => {
                         const stepProps: { completed?: boolean } = {};
-                        const labelProps: {} = {};
+                        const labelProps: { className: string } = {
+                            className: 'text-xs',
+                        };
 
                         return (
                             <Step key={label} {...stepProps}>
@@ -38,6 +41,7 @@ const LoginStepper: React.FC<ViewChildProps<MainVM>> = observer(({ vm }) => {
                             display: 'flex',
                             flexDirection: 'row',
                             pt: 2,
+                            pb: 2,
                         }}
                     >
                         <button
@@ -74,16 +78,6 @@ const LoginStepper: React.FC<ViewChildProps<MainVM>> = observer(({ vm }) => {
                             </svg>
                         </button>
                         <Box sx={{ flex: '1 1 auto' }} />
-
-                        <Button
-                            onClick={() => {
-                                vm.handleNext();
-                            }}
-                        >
-                            {vm.activeStep === vm.steps.length - 1
-                                ? 'Finish'
-                                : 'Next'}
-                        </Button>
                     </Box>
                     {vm.activeStep === 0 && <AuthForm vm={vm} />}
                     {vm.activeStep === 1 && <SessionOptions vm={vm} />}

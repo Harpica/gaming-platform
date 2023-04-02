@@ -33,13 +33,13 @@ const GameView: React.FC<GameViewProps> = observer(
         }, []);
 
         return (
-            <div className='grid justify-center grid-cols-[400px_1fr] w-full  h-screen text-white bg-gradient-to-r from-sky-500 to-indigo-500 overflow-hidden'>
+            <div className='flex flex-col-reverse gap-5 justify-center md:grid md:grid-cols-[400px_1fr] w-full  h-full min-h-screen text-white bg-gradient-to-r from-sky-500 to-indigo-500 overflow-auto'>
                 <Chat currentUser={currentUser} opponent={vm.opponent} />
                 <div className='grid grid-rows-[50px_1fr] grid-cols-[1fr] justify-center w-full'>
                     <button
                         type='button'
                         aria-label='exit'
-                        className='justify-self-end pr-4'
+                        className='justify-self-end pr-4 hover:opacity-60'
                         onClick={() => {
                             vm.logOut();
                         }}

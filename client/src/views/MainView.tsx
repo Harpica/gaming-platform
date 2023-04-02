@@ -33,8 +33,8 @@ const MainView: React.FC<MainViewProps> = observer(
         );
 
         return (
-            <div className='grid justify-center grid-rows-[150px_1fr] grid-cols-[minmax(230px,_1280px)] w-full  h-screen text-white bg-gradient-to-r from-sky-500 to-indigo-500 overflow-hidden'>
-                <h1 className='text-5xl p-4 uppercase self-center font-bold'>
+            <div className='grid justify-center grid-rows-[minmax(min-content,max-content)_1fr] grid-cols-[minmax(230px,_1280px)] w-full h-full min-h-screen text-white bg-gradient-to-r from-sky-500 to-indigo-500 overflow-hidden'>
+                <h1 className='text-lg md:text-5xl p-4 md:p-7 uppercase self-center font-bold'>
                     Gaming platform
                 </h1>
 

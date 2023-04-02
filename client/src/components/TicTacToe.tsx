@@ -7,7 +7,7 @@ const TicTacToeView: React.FC<ViewChildProps<GameVM>> = observer(({ vm }) => {
     const game = vm.game as TicTacToe;
     return (
         <div className='w-full flex items-center justify-center'>
-            <div className='flex flex-col gap-3 bg-white text-black rounded shadow-md max-w-[600px] w-[70%] p-4'>
+            <div className='flex flex-col gap-3 bg-white text-black rounded shadow-md max-w-[600px] w-full lg:w-[70%] p-4'>
                 {game.winner ? (
                     <p className='font-bold text-center text-lg'>
                         {game.winner} win!
@@ -37,7 +37,7 @@ const TicTacToeView: React.FC<ViewChildProps<GameVM>> = observer(({ vm }) => {
                         game.matrix.size === 3 && ' grid-cols-3 grid-rows-3'
                     } ${game.matrix.size === 5 && ' grid-cols-5 grid-rows-5'} ${
                         game.matrix.size === 7 && ' grid-cols-7 grid-rows-7'
-                    } self-center gap-[2px] bg-indigo-500`}
+                    } self-center gap-[2px] bg-indigo-500 min-w-320`}
                 >
                     {game.matrix.elements.map((element, i) => (
                         <button
@@ -51,7 +51,7 @@ const TicTacToeView: React.FC<ViewChildProps<GameVM>> = observer(({ vm }) => {
                             onClick={(e) => {
                                 game.handleUserTurn(e);
                             }}
-                            className={`enabled:hover:opacity-60 enabled:cursor-pointer w-12 h-12  ${
+                            className={`enabled:hover:opacity-60 enabled:cursor-pointer w-10 h-10 lg:w-12 lg:h-12  ${
                                 game.checkIfIndexIsInWinArray(i)
                                     ? 'bg-blue-200'
                                     : 'bg-white'

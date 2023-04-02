@@ -1,8 +1,6 @@
 import { makeAutoObservable } from 'mobx';
 import { TicTacToe } from '../utils/TicTacToe';
 import {
-    Game,
-    GameData,
     GameMessage,
     GameMessageResponse,
     GameObject,

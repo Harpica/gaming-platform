@@ -1,15 +1,16 @@
 import { observer } from 'mobx-react-lite';
+import { RULES } from '../utils/constants';
 import { ViewChildProps } from '../utils/types';
 import { GameVM } from '../viewModels/Game.VM';
 
 const ReadyCheck: React.FC<ViewChildProps<GameVM>> = observer(({ vm }) => {
     return (
         <div className='w-full flex items-center justify-center'>
-            <div className='flex flex-col gap-3 bg-white text-black rounded shadow-md max-w-[600px] w-[70%] p-4'>
+            <div className='flex flex-col gap-3 bg-white text-black rounded shadow-md max-w-[600px] w-full md:w-[70%] p-4'>
                 <h1 className='font-bold text-center text-lg'>
                     {vm.session.game}
                 </h1>
-                <p>Some rules</p>
+                <p className='whitespace-pre-line'>{RULES[vm.session.game]}</p>
                 <ul>
                     <li>
                         {vm.currentUser}:{' '}

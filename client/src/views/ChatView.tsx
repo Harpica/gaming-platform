@@ -20,8 +20,8 @@ const Chat: React.FC<ChatProps> = observer(({ currentUser, opponent }) => {
     }, [currentUser, opponent]);
 
     return (
-        <div className='grid grid-rows-[1fr_60px] bg-white p-4'>
-            <ul className='list-none flex flex-col justify-end gap-3 pb-4 overflow-auto'>
+        <div className='grid grid-rows-[minmax(250px,1fr)_60px] items-end bg-white overflow-hidden'>
+            <ul className='list-none flex flex-col gap-3 pb-4 overflow-auto h-fit max-h-[250px] md:max-h-full md:h-fit p-4'>
                 {vm.messages.map((message, i) => (
                     <li
                         key={`message-${i}`}
@@ -36,7 +36,7 @@ const Chat: React.FC<ChatProps> = observer(({ currentUser, opponent }) => {
                 ))}
             </ul>
             <form
-                className='self-center flex flex-row justify-between'
+                className='self-center flex flex-row justify-between p-4'
                 onSubmit={(e) => {
                     vm.send(e);
                 }}
@@ -44,10 +44,19 @@ const Chat: React.FC<ChatProps> = observer(({ currentUser, opponent }) => {
                 <input
                     type={'text'}
                     name='chat'
-                    placeholder='Start writting...'
-                    className='text-black p-3 outline-none focus:outline-none'
+                    disabled={vm.opponent === ''}
+                    placeholder={`${
+                        vm.opponent !== ''
+                            ? 'Start writting...'
+                            : 'Waiting for another player... '
+                    }`}
+                    className='text-black p-3 min-w-[250px] outline-none focus:outline-none'
                 />
-                <button type='submit' className='text-indigo-600'>
+                <button
+                    type='submit'
+                    disabled={vm.opponent === ''}
+                    className='text-indigo-600 enabled:hover:opacity-60'
+                >
                     Send
                 </button>
             </form>

@@ -10,7 +10,7 @@ const TsoroYematatuView: React.FC<ViewChildProps<GameVM>> = observer(
         const game = useMemo(() => vm.game as TsoroYematatu, []);
         return (
             <div className='w-full flex items-center justify-center'>
-                <div className='flex flex-col gap-3 bg-white text-black rounded shadow-md max-w-[600px] w-[70%] p-4'>
+                <div className='flex flex-col gap-3 bg-white text-black rounded shadow-md max-w-[600px] w-full md:w-[70%] p-4'>
                     {game.winner ? (
                         <p className='font-bold text-center text-lg'>
                             {game.winner} win!

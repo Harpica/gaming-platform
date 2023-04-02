@@ -2,10 +2,12 @@ import Slider from '@mui/material/Slider';
 import { observer } from 'mobx-react-lite';
 import { TicTacToeData, ViewChildProps } from '../utils/types';
 import { MainVM } from '../viewModels/Main.VM';
+import TicTacToeImage from '../images/TicTacToe.jpg';
+import TsoroYematatuImage from '../images/TsoroYematatu.jpg';
 
 const GamesChoice: React.FC<ViewChildProps<MainVM>> = observer(({ vm }) => {
     return (
-        <ul className='w-full flex list-none justify-around flex-wrap gap-5'>
+        <ul className='w-full flex list-none justify-around flex-wrap gap-5 p-4'>
             <li className='w-80 h-[400px]'>
                 <form
                     className='bg-white rounded flex flex-col gap-2 justify-between text-black p-5 h-full'
@@ -19,6 +21,11 @@ const GamesChoice: React.FC<ViewChildProps<MainVM>> = observer(({ vm }) => {
                     }}
                 >
                     <h2 className='text-center font-bold mb-4'>Tic-Tac-Toe</h2>
+                    <img
+                        src={TicTacToeImage}
+                        alt='TicTacToe preview'
+                        className='h-[200px] w-[200px] self-center'
+                    />
                     <div className='flex flex-col justify-center'>
                         <label htmlFor='gridSize' className='text-center'>
                             Grid size
@@ -62,6 +69,11 @@ const GamesChoice: React.FC<ViewChildProps<MainVM>> = observer(({ vm }) => {
                     <h2 className='text-center font-bold mb-4'>
                         Tsoro Yematatu
                     </h2>
+                    <img
+                        src={TsoroYematatuImage}
+                        alt='TsoroYematatu preview'
+                        className=' w-[200px] self-center'
+                    />
                     <div className='rounded bg-gradient-to-r from-sky-500 to-indigo-500 p-1 hover:opacity-80 transition-all active:scale-90 shrink-0 self-center '>
                         <button
                             type='submit'

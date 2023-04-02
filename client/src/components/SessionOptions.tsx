@@ -3,9 +3,9 @@ import { MainVM } from '../viewModels/Main.VM';
 
 const SessionOptions: React.FC<ViewChildProps<MainVM>> = ({ vm }) => {
     return (
-        <ul className='w-full flex list-none justify-around flex-wrap gap-5'>
+        <ul className='w-full flex list-none justify-around flex-wrap gap-5 p-4'>
             <li
-                className='cursor-pointer bg-white text-black font-bold shadow-md rounded px-8 py-8 pt-8 flex flex-col gap-4 self-center min-w-[320px] hover:scale-105 hover:text-indigo-600  hover:stroke-indigo-600 hover:fill-indigo-600 transition-all svg-container'
+                className='cursor-pointer bg-white text-black font-bold shadow-md rounded px-8 py-8 pt-8 flex flex-col gap-4 self-center w-full md:w-fit md:self-center  md:min-w-[320px] hover:scale-105 hover:text-indigo-600  hover:stroke-indigo-600 hover:fill-indigo-600 transition-all svg-container'
                 onClick={() => {
                     vm.handleCreateOrJoinChoice(true);
                 }}
@@ -42,7 +42,7 @@ const SessionOptions: React.FC<ViewChildProps<MainVM>> = ({ vm }) => {
                 </p>
             </li>
             <li
-                className='cursor-pointer bg-white text-black font-bold shadow-md rounded px-8 py-8 pt-8 flex flex-col gap-4 self-center min-w-[320px] hover:scale-105 hover:text-indigo-600 transition-all svg-container'
+                className='cursor-pointer bg-white text-black font-bold shadow-md rounded px-8 py-8 pt-8 flex flex-col gap-4 w-full md:w-fit md:self-center  md:min-w-[320px] hover:scale-105 hover:text-indigo-600 transition-all svg-container'
                 onClick={() => {
                     vm.handleCreateOrJoinChoice(false);
                 }}

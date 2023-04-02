@@ -17,16 +17,18 @@ export class ChatVM {
 
     send(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        const chatMessageBody = (
-            e.currentTarget.elements.namedItem('chat') as HTMLInputElement
-        ).value;
-        const message: ChatMessage = {
-            type: 'chat',
-            repicientName: this.opponent,
-            data: { sender: this.currentUser, body: chatMessageBody },
-        };
-        console.log('message', message);
-        this.ws.sendMessage(message);
+        if (this.opponent !== '') {
+            const chatMessageBody = (
+                e.currentTarget.elements.namedItem('chat') as HTMLInputElement
+            ).value;
+            const message: ChatMessage = {
+                type: 'chat',
+                repicientName: this.opponent,
+                data: { sender: this.currentUser, body: chatMessageBody },
+            };
+            console.log('message', message);
+            this.ws.sendMessage(message);
+        }
     }
     listenToMessages() {
         this.ws.addFunctionToMessageHandler('chat', (data: ChatMessage) => {
